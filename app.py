@@ -7,6 +7,7 @@ import paho.mqtt.client as mqtt
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 
 #Ceddy Espanol
+#last na to
 
 app = Flask(__name__)
 app.secret_key = 'hatchguard_secret_key_123'
