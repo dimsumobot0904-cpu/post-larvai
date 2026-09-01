@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}About Us | POST-LARVAI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .header-logo { text-align: center; margin-bottom: 30px; }
+    .header-logo h1 { color: #00a8cc; font-size: 30px; font-weight: 800; }
+    .header-logo p { color: #64748b; font-size: 14px; margin-top: 6px; max-width: 750px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
+    .grid-2 p { line-height: 1.7; color: #475569; font-size: 14px; }
+
+    .features-list { list-style: none; }
+    .features-list li { margin-bottom: 10px; color: #334155; display: flex; align-items: center; font-size: 13.5px; font-weight: 500; }
+    .features-list li::before { content: "✓"; background: #00a8cc; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; justify-content: center; align-items: center; margin-right: 10px; font-size: 11px; font-weight: bold; flex-shrink: 0; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9; }
+    .stat-number { font-size: 32px; font-weight: 800; color: #00a8cc; }
+    .stat-label { font-size: 12px; color: #64748b; margin-top: 4px; font-weight: 600; text-transform: uppercase; }
+
+    .team-section { text-align: center; margin-top: 40px; }
+    .team-section h2 { font-size: 24px; color: #00a8cc; margin-bottom: 6px; font-weight: 700; }
+    .team-section p { color: #64748b; font-size: 13.5px; margin-bottom: 25px; }
+
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+    .team-card { background: white; border-radius: 14px; padding: 18px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); border: 1px solid #f1f5f9; text-align: center; }
+    .img-container { width: 100%; height: 210px; background-color: #f1f5f9; border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
+    .img-container img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .member-name { font-weight: 700; font-size: 13px; color: #1e293b; margin-bottom: 8px; height: 35px; display: flex; align-items: center; justify-content: center; }
+    .member-role { background-color: #00a8cc; color: white; padding: 6px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; display: inline-block; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="header-logo">
+        <h1>POST-LARVAI</h1>
+        <p>A Self-Regulated System for Monitoring, Feeding, and Predicting Future Status of Giant Freshwater Prawn Post-Larvae in a Controlled Environment</p>
+    </div>
+
+    <div class="card">
+        <h2 style="color: #00a8cc; font-size: 20px; margin-bottom: 15px;">About POST-LARVAI System</h2>
+        <p style="color: #475569; line-height: 1.6; font-size: 14.5px;">
+            <strong>POST-LARVAI</strong> revolutionizes freshwater prawn hatchery management through intelligent automation and predictive analytics, ensuring optimal growth conditions and maximum survivability rates.
+        </p>
+
+        <div class="grid-2">
+            <div>
+                <p>
+                    Our innovative system integrates advanced machine learning algorithms with real-time environmental monitoring to create the perfect controlled environment for giant freshwater prawn post-larvae. By continuously analyzing water quality such as temperature, pH, DO, ammonia, turbidity, nitrite levels, and feeding patterns, POST-LARVAI automatically adjusts conditions to maximize growth and survival rates.
+                </p>
+            </div>
+            <div>
+                <h3 style="color: #00a8cc; font-size: 15px; margin-bottom: 12px;">System Features</h3>
+                <ul class="features-list">
+                    <li>Real-time water quality monitoring and alerts</li>
+                    <li>Automated feeding with portion control</li>
+                    <li>Machine learning-based survivability prediction</li>
+                    <li>Self-regulating environmental controls</li>
+                    <li>Comprehensive data analytics dashboard</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div>
+                <div class="stat-number">what percentage</div>
+                <div class="stat-label">System Accuracy</div>
+            </div>
+            <div>
+                <div class="stat-number">what pereccentage ulit</div>
+                <div class="stat-label">Increased Survivability</div>
+            </div>
+            <div>
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Automated Monitoring</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="team-section">
+        <h2>Our Team</h2>
+        <p>Meet the dedicated professionals behind our innovative water monitoring system</p>
+
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="img-container"><img src="{{ url_for('static', filename='images/LORRAINE.jpeg') }}" onerror="this.src='https://via.placeholder.com/200x210?text=No+Image';"></div>
+                <div class="member-name">LORRAINE MAY S. MARCELO</div>
+                <div class="member-role">OWNER & TECH SPECIALIST</div>
+            </div>
+            <div class="team-card">
+                <div class="img-container"><img src="{{ url_for('static', filename='images/ANNELIE.jpg') }}" onerror="this.src='https://via.placeholder.com/200x210?text=No+Image';"></div>
+                <div class="member-name">ANNELIE MAY A. CAPAL</div>
+                <div class="member-role">OWNER & TECH SPECIALIST</div>
+            </div>
+            <div class="team-card">
+                <div class="img-container"><img src="{{ url_for('static', filename='images/AERON.jpg') }}" onerror="this.src='https://via.placeholder.com/200x210?text=No+Image';"></div>
+                <div class="member-name">JAN AERON R. GARCIA</div>
+                <div class="member-role">OWNER & TECH SPECIALIST</div>
+            </div>
+            <div class="team-card">
+                <div class="img-container"><img src="{{ url_for('static', filename='images/ZENCY.jpg') }}" onerror="this.src='https://via.placeholder.com/200x210?text=No+Image';"></div>
+                <div class="member-name">ZENCY D.S. GARCIA</div>
+                <div class="member-role">OWNER & TECH SPECIALIST</div>		
+ 	   </div>
+            <div class="team-card">
+                <div class="img-container"><img src="{{ url_for('static', filename='images/JENADEL.jpg') }}" onerror="this.src='https://via.placeholder.com/200x210?text=No+Image';"></div>
+                <div class="member-name">ENGR. JENADEL DL. ANTIPOLO</div>
+                <div class="member-role">OWNER & TECH SPECIALIST</div>
+            </div>
+            <div class="team-card">
+                <div class="img-container"><img src="{{ url_for('static', filename='images/JEMUEL.jpg') }}" onerror="this.src='https://via.placeholder.com/200x210?text=No+Image';"></div>
+                <div class="member-name">ENGR. JEMUEL V. LANDERITO</div>
+                <div class="member-role">OWNER & TECH SPECIALIST</div>
+           
+            </div>
+        </div>
+    </div>
+{% endblock %}

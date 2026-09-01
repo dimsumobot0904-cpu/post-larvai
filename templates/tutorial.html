@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Tutorial | POST-LARVAI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .tutorial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+    .step-number { background: #00a8cc; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 12px; }
+    .guide-box { background: #f8fafc; border-left: 4px solid #00a8cc; padding: 15px; border-radius: 6px; margin-top: 15px; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>System Tutorial & User Guide</h1>
+    <p style="color: #64748b; margin-top: 5px;">Learn how to use the POST-LARVAI Water Monitoring System.</p>
+    <p style="color: #64748b; margin-top: 5px;">Alamin kung paano gamitin ang POST-LARVAI Water Monitoring System.</p>
+
+    <div class="tutorial-grid">
+        <div class="card">
+            <div class="step-number">1</div>
+            <h3 style="color: #00a8cc;">Dashboard Overview</h3>
+            <p style="color: #64748b; font-size: 14px; margin-top: 8px; line-height: 1.5;">
+               The Dashboard shows the overall status of the system. It displays the real-time status of the sensors and relays that control the water environment.
+	    <p style="color: #64748b; font-size: 14px; margin-top: 8px; line-height: 1.5;">
+                Sa Dashboard makikita ang pangkalahatang estado ng system. Dito naka-display ang real-time status ng mga sensors at relays na nagkokontrol sa water environment. 
+	   </p>
+        </div>
+
+        <div class="card">
+            <div class="step-number">2</div>
+            <h3 style="color: #00a8cc;">Sensors Data Monitoring</h3>
+            <p style="color: #64748b; font-size: 14px; margin-top: 8px; line-height: 1.5;">
+		Go to **Sensors Data** to monitor the pH level, Dissolved Oxygen (DO), Temperature, and Turbidity in the water containing giant freshwater prawn post-larvae.
+            <p style="color: #64748b; font-size: 14px; margin-top: 8px; line-height: 1.5;">   
+		Pumunta sa **Sensors Data** para masubaybayan ang pH level, Dissolved Oxygen (DO), Temperature, at Turbidity sa tubigan ng giant freshwater prawn post-larvae.
+            </p>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top: 25px;">
+        <h3 style="color: #00a8cc;">Recommended Water Parameters for Ulang Larvae</h3>
+        <div class="guide-box">
+            <ul style="padding-left: 20px; color: #475569; font-size: 14px; line-height: 1.8;">
+                <li><strong>Temperature:</strong> 28°C - 31°C</li>
+		<li><strong>pH Level:</strong> 7.5 - 8.5 (Optimal: 7.8 - 8.2)</li>               
+                <li><strong>Dissolved Oxygen (DO):</strong> > 5.0 mg/L</li>
+                <li><strong>Nitrite:</strong> 0.01 - 0.25 </li>
+		<li><strong>Ammonia:</strong> > 0.1 ppm </li>
+		<li><strong>Turbidity:</strong> > (aalamin pa) </li>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

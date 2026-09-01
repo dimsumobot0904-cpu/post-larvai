@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Feeding Data | HATCHGUARD{% endblock %}
+{% block page_breadcrumb %}Feeding History Reports{% endblock %}
+
+{% block extra_css %}
+<style>
+    .kpi-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+    @media (max-width: 768px) { .kpi-cards { grid-template-columns: 1fr; } }
+    .kpi-card {
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .kpi-card.teal { background-color: #00a8cc; }
+    .kpi-card.green { background-color: #22c55e; }
+    .kpi-card.amber { background-color: #f59e0b; }
+    
+    .kpi-val { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+    .kpi-lbl { font-size: 0.85rem; font-weight: 600; margin-top: 5px; opacity: 0.9; }
+    .kpi-icon { font-size: 2.5rem; opacity: 0.4; }
+
+    .filter-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    .filter-title {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .filter-row {
+        display: flex;
+        gap: 15px;
+        align-items: flex-end;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+        min-width: 180px;
+    }
+    .filter-group label { font-size: 0.8rem; font-weight: 700; color: #64748b; }
+    .filter-group input, .filter-group select {
+        padding: 9px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        outline: none;
+    }
+    .btn-filter {
+        background-color: #00a8cc;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .feed-table { width: 100%; border-collapse: collapse; }
+    .feed-table th, .feed-table td { padding: 12px 15px; text-align: left; font-size: 0.85rem; border-bottom: 1px solid #f1f5f9; }
+    .feed-table th { background-color: #f8fafc; color: #475569; font-weight: 700; }
+    .badge-completed { color: #16a34a; font-weight: 700; display: flex; align-items: center; gap: 5px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Top KPI Summary Cards -->
+<div class="kpi-cards">
+    <div class="kpi-card teal">
+        <div>
+            <div class="kpi-val">3</div>
+            <div class="kpi-lbl">Total Logs</div>
+        </div>
+        <div class="kpi-icon"><i class="fa-solid fa-rotate-left"></i></div>
+    </div>
+    <div class="kpi-card green">
+        <div>
+            <div class="kpi-val">0</div>
+            <div class="kpi-lbl">Feedings Today</div>
+        </div>
+        <div class="kpi-icon"><i class="fa-regular fa-calendar-check"></i></div>
+    </div>
+    <div class="kpi-card amber">
+        <div>
+            <div class="kpi-val">100%</div>
+            <div class="kpi-lbl">Success Rate</div>
+        </div>
+        <div class="kpi-icon"><i class="fa-solid fa-circle-check"></i></div>
+    </div>
+</div>
+
+<!-- Logs Filter & Table -->
+<div class="filter-card">
+    <div class="filter-title"><i class="fa-solid fa-utensils" style="color:#00a8cc;"></i> Feeding Logs</div>
+    
+    <div class="filter-row">
+        <div class="filter-group">
+            <label>Start Date</label>
+            <input type="date" value="2026-01-22">
+        </div>
+        <div class="filter-group">
+            <label>End Date</label>
+            <input type="date" value="2026-02-21">
+        </div>
+        <div class="filter-group">
+            <label>Status</label>
+            <select>
+                <option>All Statuses</option>
+                <option>Completed</option>
+                <option>Pending</option>
+            </select>
+        </div>
+        <button class="btn-filter"><i class="fa-solid fa-filter"></i> Filter Logs</button>
+    </div>
+
+    <table class="feed-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Feeding Time</th>
+                <th>Status</th>
+                <th>Notes / Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>#FDL-103</td>
+                <td>2026-02-20 06:00 AM</td>
+                <td><span class="badge-completed"><i class="fa-solid fa-circle-check"></i> Completed</span></td>
+                <td>Scheduled Feeding #1 executed successfully.</td>
+            </tr>
+            <tr>
+                <td>#FDL-102</td>
+                <td>2026-02-19 12:00 PM</td>
+                <td><span class="badge-completed"><i class="fa-solid fa-circle-check"></i> Completed</span></td>
+                <td>Scheduled Feeding #2 executed successfully.</td>
+            </tr>
+            <tr>
+                <td>#FDL-101</td>
+                <td>2026-02-18 06:00 PM</td>
+                <td><span class="badge-completed"><i class="fa-solid fa-circle-check"></i> Completed</span></td>
+                <td>Scheduled Feeding #3 executed successfully.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

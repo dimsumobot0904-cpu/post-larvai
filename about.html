@@ -1,0 +1,199 @@
+cat << 'EOF' > ~/watermonitoring/templates/about.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | HATCHGUARD</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { display: flex; background-color: #f8fafc; color: #334155; }
+        
+        /* Sidebar Navigation */
+        .sidebar { width: 240px; height: 100vh; background: #ffffff; padding: 25px 20px; border-right: 1px solid #e2e8f0; position: fixed; top: 0; left: 0; }
+        .sidebar h2 { color: #008b8b; margin-bottom: 30px; font-size: 22px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        .sidebar ul { list-style: none; }
+        .sidebar ul li { margin-bottom: 10px; }
+        .sidebar ul li a { text-decoration: none; color: #64748b; font-weight: 600; display: block; padding: 12px 16px; border-radius: 8px; transition: all 0.2s ease; }
+        .sidebar ul li a.active { background-color: #008b8b; color: white; }
+        .sidebar ul li a:hover:not(.active) { background-color: #f1f5f9; color: #008b8b; }
+
+        /* Main Content Area */
+        .main-content { margin-left: 240px; padding: 40px; width: calc(100% - 240px); }
+        
+        .header-logo { text-align: center; margin-bottom: 35px; }
+        .header-logo h1 { color: #008b8b; font-size: 32px; font-weight: 800; letter-spacing: 0.5px; }
+        .header-logo p { color: #64748b; font-size: 14px; margin-top: 8px; max-width: 700px; margin-left: auto; margin-right: auto; line-height: 1.5; }
+
+        /* About System Card */
+        .about-card { background: white; padding: 35px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); margin-bottom: 40px; border: 1px solid #f1f5f9; }
+        .about-card h2 { color: #008b8b; margin-bottom: 20px; border-left: 5px solid #008b8b; padding-left: 12px; font-size: 22px; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 35px; margin-top: 20px; }
+        .grid-2 p { line-height: 1.7; color: #475569; font-size: 14.5px; }
+        
+        .features-list { list-style: none; }
+        .features-list li { margin-bottom: 12px; color: #334155; display: flex; align-items: center; font-size: 14px; font-weight: 500; }
+        .features-list li::before { content: "✓"; background: #008b8b; color: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; justify-content: center; align-items: center; margin-right: 12px; font-size: 12px; font-weight: bold; flex-shrink: 0; }
+
+        /* Stats Section */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; text-align: center; margin-top: 35px; padding-top: 25px; border-top: 1px solid #f1f5f9; }
+        .stat-number { font-size: 36px; font-weight: 800; color: #008b8b; }
+        .stat-label { font-size: 13px; color: #64748b; margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Team Section */
+        .team-section { text-align: center; margin-top: 40px; }
+        .team-section h2 { font-size: 26px; color: #008b8b; margin-bottom: 6px; font-weight: 700; }
+        .team-section p { color: #64748b; font-size: 14px; margin-bottom: 35px; }
+        
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; }
+        .team-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03); border: 1px solid #f1f5f9; transition: transform 0.2s ease; }
+        .team-card:hover { transform: translateY(-5px); }
+        
+        .img-container { width: 100%; height: 230px; background-color: #f1f5f9; border-radius: 12px; margin-bottom: 18px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .img-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .member-name { font-weight: 700; font-size: 13.5px; color: #1e293b; margin-bottom: 10px; height: 38px; display: flex; align-items: center; justify-content: center; }
+        .member-role { background-color: #008b8b; color: white; padding: 7px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h2>HATCHGUARD</h2>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+            <li><a href="{{ url_for('sensors') }}">Sensors Data</a></li>
+            <li><a href="{{ url_for('feeding') }}">Feeding Data</a></li>
+            <li><a href="{{ url_for('about') }}" class="active">About Us</a></li>
+            <li><a href="{{ url_for('tutorial') }}">Tutorial</a></li>
+            <li><a href="{{ url_for('chat') }}">Chat</a></li>
+            <li><a href="{{ url_for('logout') }}" style="color: #ef4444;">Sign Out</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Header Title -->
+        <div class="header-logo">
+            <h1>HATCHGUARD-ML</h1>
+            <p>A Self-Regulated Hatchery System for Monitoring, Feeding, and Predicting Survivability of Giant Freshwater Prawn Larvae in a Controlled Environment</p>
+        </div>
+
+        <!-- About Description -->
+        <div class="about-card">
+            <h2>About HATCHGUARD-ML System</h2>
+            <p style="color: #475569; line-height: 1.6; margin-bottom: 20px; font-size: 15px;">
+                <strong>HATCHGUARD-ML</strong> revolutionizes freshwater prawn hatchery management through intelligent automation and predictive analytics, ensuring optimal growth conditions and maximum survivability rates.
+            </p>
+
+            <div class="grid-2">
+                <div>
+                    <p>
+                        Our innovative system integrates advanced machine learning algorithms with real-time environmental monitoring to create the perfect controlled environment for giant freshwater prawn larvae. By continuously analyzing water quality, temperature, pH levels, and feeding patterns, HATCHGUARD-ML automatically adjusts conditions to maximize growth and survival rates.
+                    </p>
+                    <p style="margin-top: 15px;">
+                        The system's predictive capabilities allow hatchery operators to anticipate potential issues before they occur, reducing losses and increasing overall productivity. Our automated feeding system ensures precise nutrition delivery at optimal intervals, eliminating human error and inconsistency.
+                    </p>
+                </div>
+                <div>
+                    <h3 style="color: #008b8b; font-size: 16px; margin-bottom: 15px;">System Features</h3>
+                    <ul class="features-list">
+                        <li>Real-time water quality monitoring and alerts</li>
+                        <li>Automated feeding with portion control</li>
+                        <li>Machine learning-based survivability prediction</li>
+                        <li>Self-regulating environmental controls</li>
+                        <li>Comprehensive data analytics dashboard</li>
+                        <li>Web app for remote monitoring</li>
+                        <li>Automated health assessment of larvae</li>
+                        <li>Customizable growth optimization algorithms</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div>
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">System Accuracy</div>
+                </div>
+                <div>
+                    <div class="stat-number">40%</div>
+                    <div class="stat-label">Increased Survivability</div>
+                </div>
+                <div>
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Automated Monitoring</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Team Section -->
+        <div class="team-section">
+            <h2>Our Team</h2>
+            <p>Meet the dedicated professionals behind our innovative hatchery system</p>
+
+            <div class="team-grid">
+                <!-- Member 1 -->
+                <div class="team-card">
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='images/klydel.jpg') }}" alt="Klydel Rei D. Pereira" onerror="this.src='https://via.placeholder.com/200x230?text=No+Image';">
+                    </div>
+                    <div class="member-name">KLYDEL REI D. PEREIRA</div>
+                    <div class="member-role">OWNER & TECH SPECIALIST</div>
+                </div>
+
+                <!-- Member 2 -->
+                <div class="team-card">
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='images/heizel.jpg') }}" alt="Heizel V. Escandor" onerror="this.src='https://via.placeholder.com/200x230?text=No+Image';">
+                    </div>
+                    <div class="member-name">HEIZEL V. ESCANDOR</div>
+                    <div class="member-role">OWNER & TECH SPECIALIST</div>
+                </div>
+
+                <!-- Member 3 -->
+                <div class="team-card">
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='images/christian.jpg') }}" alt="Christian Julius C. Fulgueras" onerror="this.src='https://via.placeholder.com/200x230?text=No+Image';">
+                    </div>
+                    <div class="member-name">CHRISTIAN JULIUS C. FULGUERAS</div>
+                    <div class="member-role">OWNER & TECH SPECIALIST</div>
+                </div>
+
+                <!-- Member 4 -->
+                <div class="team-card">
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='images/joan.jpg') }}" alt="Joan Kerlsie G. Hipolito" onerror="this.src='https://via.placeholder.com/200x230?text=No+Image';">
+                    </div>
+                    <div class="member-name">JOAN KERLSIE G. HIPOLITO</div>
+                    <div class="member-role">OWNER & TECH SPECIALIST</div>
+                </div>
+
+                <!-- Member 5 -->
+                <div class="team-card">
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='images/jemuel.jpg') }}" alt="Engr. Jemuel V. Landerito" onerror="this.src='https://via.placeholder.com/200x230?text=No+Image';">
+                    </div>
+                    <div class="member-name">ENGR. JEMUEL V. LANDERITO</div>
+                    <div class="member-role">OWNER & TECH SPECIALIST</div>
+                </div>
+
+                <!-- Member 6 -->
+                <div class="team-card">
+                    <div class="img-container">
+                        <img src="{{ url_for('static', filename='images/jenadel.jpg') }}" alt="Engr. Jenadel DL. Antipolo" onerror="this.src='https://via.placeholder.com/200x230?text=No+Image';">
+                    </div>
+                    <div class="member-name">ENGR. JENADEL DL. ANTIPOLO</div>
+                    <div class="member-role">OWNER & TECH SPECIALIST</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
+EOF

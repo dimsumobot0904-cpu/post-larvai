@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HATCHGUARD-ML | Water Monitoring System{% endblock %}</title>
+    <!-- Chart.js for time-series graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-bg: #ffffff;
+            --main-bg: #f4f6f9;
+            --teal-primary: #00a8cc;
+            --teal-dark: #008ba8;
+            --card-border: #e2e8f0;
+            --text-dark: #2c3e50;
+            --text-gray: #8c98a4;
+            --status-green: #2ecc71;
+            --status-yellow: #f1b70e;
+            --status-red: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--main-bg);
+            color: var(--text-dark);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Navigation --- */
+        .sidebar {
+            width: 230px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--card-border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .logo-area {
+            padding: 20px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--teal-primary);
+            letter-spacing: 0.5px;
+        }
+
+        .user-profile {
+            margin: 0 12px 20px 12px;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 25px;
+            border: 1px solid #edf2f7;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--teal-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .user-info {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .user-status {
+            font-size: 0.7rem;
+            color: var(--status-green);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0 10px;
+        }
+
+        .nav-item {
+            margin-bottom: 4px;
+        }
+
+        .nav-item a {
+            padding: 12px 16px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item a:hover { color: var(--teal-primary); }
+
+        .nav-item a.active {
+            background-color: var(--teal-primary);
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(0, 168, 204, 0.3);
+        }
+
+        /* --- Main Layout --- */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .top-navbar {
+            background: #ffffff;
+            padding: 12px 30px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-left-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .top-left-title i { color: #38bdf8; }
+
+        .container { padding: 20px 30px; }
+
+        /* --- Common UI Components --- */
+        .section-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            margin-bottom: 20px;
+        }
+
+        .card-header-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-teal {
+            background: var(--teal-primary);
+            color: white;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-teal:hover { background: var(--teal-dark); }
+
+        .input-field {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #334155;
+            outline: none;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <div class="logo-area">
+           <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px; height: 40px; object-fit: contain;">
+            <span class="logo-title">POST-LARVAI</span>
+        </div>
+
+        <div class="user-profile">
+            <div class="user-avatar">B</div>
+            <div>
+                <div class="user-info">URSM RESEARCHERS</div>
+                <div class="user-status"><i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Online</div>
+            </div>
+        </div>
+
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a href="/dashboard" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-gauge-high"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/sensors" class="{% if request.endpoint == 'sensors' %}active{% endif %}">
+                    <i class="fa-solid fa-microchip"></i> Sensors Data
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/feeding" class="{% if request.endpoint == 'feeding' %}active{% endif %}">
+                    <i class="fa-solid fa-bowl-food"></i> Feeding Data
+                </a>
+            </li>
+            <li class="nav-item"><a href="/about"><i class="fa-solid fa-circle-info"></i> About Us</a></li>
+            <li class="nav-item"><a href="/tutorial"><i class="fa-solid fa-book"></i> Tutorial</a></li>
+            <li class="nav-item"><a href="/chat"><i class="fa-solid fa-comments"></i> Chat</a></li>
+            <li class="nav-item" style="margin-top: 30px;">
+                <a href="/logout" style="color: var(--status-red);">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Workspace Area -->
+    <div class="workspace">
+        <!-- Top Header Navigation -->
+        <div class="top-navbar">
+            <div class="top-left-title">
+                <i class="fa-solid fa-droplet"></i> Current Water Parameters - <span id="live-clock">--</span>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-gray);">
+                Home / <span style="color:var(--teal-primary);">{% block page_breadcrumb %}Analytic Dashboard{% endblock %}</span>
+            </div>
+        </div>
+
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-US');
+            const clockEl = document.getElementById('live-clock');
+            if (clockEl) clockEl.innerText = `${dateStr} | ${timeStr}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

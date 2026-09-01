@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block title %}Chat Assistant | POST-LARVAI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chat-container { display: flex; flex-direction: column; height: 500px; background: white; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 4px 15px rgba(0,0,0,0.03); overflow: hidden; margin-top: 20px; }
+    .chat-header { background: #00a8cc; color: white; padding: 15px 20px; font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 10px; }
+    .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background-color: #f8fafc; }
+    
+    .message { max-width: 75%; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5; }
+    .bot-msg { background: white; color: #334155; border: 1px solid #e2e8f0; align-self: flex-start; border-bottom-left-radius: 2px; }
+    .user-msg { background: #00a8cc; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+    .chat-footer { display: flex; padding: 15px; background: white; border-top: 1px solid #e2e8f0; gap: 10px; }
+    .chat-footer input { flex: 1; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 14px; }
+    .chat-footer button { background: #00a8cc; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .chat-footer button:hover { background: #006666; }
+
+    .quick-prompts { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .prompt-btn { background: #e0f2f1; color: #006666; border: 1px solid #b2dfdb; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .prompt-btn:hover { background: #b2dfdb; }
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>POST-LARVAI Assistant</h1>
+    <p style="color: #64748b; margin-top: 5px;">Magtanong tungkol sa hatchery management, water quality, o sa Ulang (giant freshwater prawn) larvae.</p>
+
+    <div class="quick-prompts">
+        <button class="prompt-btn" onclick="sendQuickPrompt('Ano ang tamang pH level para sa Ulang?')">Ano ang tamang pH level?</button>
+        <button class="prompt-btn" onclick="sendQuickPrompt('Ano ang perpektong temperatura sa tubig?')">Tamang Temperatura</button>
+        <button class="prompt-btn" onclick="sendQuickPrompt('Bakit mahalaga ang Dissolved Oxygen?')">Dissolved Oxygen</button>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <span>🤖</span> POST-LARVAI Smart Assistant
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="message bot-msg">
+                Magandang araw! Ako ang iyong POST-LARVAI Assistant. Paano kita matutulungan sa iyong freshwater prawn hatchery ngayon?
+            </div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" id="userInput" placeholder="I-type ang iyong tanong dito..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage(text, 'user-msg');
+            input.value = '';
+
+            setTimeout(() => {
+                let reply = "Salamat sa iyong tanong! Pinananatili ng POST-LARVAI ang pinakamagandang kondisyon para sa iyong larvae sa pamamagitan ng automated sensor monitoring.";
+                
+                const lower = text.toLowerCase();
+                if (lower.includes('ph')) {
+                    reply = "Ang ideal pH level para sa Ulang (giant freshwater prawn) larvae ay nasa 7.5 hanggang 8.5. Kapag bumaba sa 7.0, kailangang mag-adjust ng tubig.";
+                } else if (lower.includes('temp') || lower.includes('temperatura')) {
+                    reply = "Ang pinakamainam na temperatura ng tubig ay 28°C hanggang 31°C upang maging mabilis at malusog ang paglaki ng larvae.";
+                } else if (lower.includes('oxygen') || lower.includes('do')) {
+                    reply = "Ang Dissolved Oxygen (DO) ay dapat manatiling mas mataas sa 5.0 mg/L para maiwasan ang pagkamatay ng larvae.";
+                }
+
+                appendMessage(reply, 'bot-msg');
+            }, 600);
+        }
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('userInput').value = promptText;
+            sendMessage();
+        }
+
+        function appendMessage(text, className) {
+            const chatBody = document.getElementById('chatBody');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message ' + className;
+            msgDiv.innerText = text;
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    </script>
+{% endblock %}
