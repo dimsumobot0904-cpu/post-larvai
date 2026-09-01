@@ -6,6 +6,8 @@ import json
 import paho.mqtt.client as mqtt
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 
+#Ceddy
+
 app = Flask(__name__)
 app.secret_key = 'hatchguard_secret_key_123'
 DB_NAME = "ulang_data.db"
