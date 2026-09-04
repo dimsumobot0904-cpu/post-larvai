@@ -4,10 +4,14 @@ import threading
 import time
 import json
 import paho.mqtt.client as mqtt
+#09/04/26 testing ai ngani
+from collections import deque
+import joblib
+import numpy as np
+from tensorflow.keras.models import load_model
+#hanggang dito 09/04/26
 from flask import Flask, request, jsonify, render_template, redirect, url_for, session
 
-#Ceddy Espanol
-#last na to
 
 app = Flask(__name__)
 app.secret_key = 'hatchguard_secret_key_123'
@@ -30,6 +34,9 @@ latest_sensor_data = {
     "turbidity": "18.3"
 }
 
+# Mag-save ng huling 10 readings para sa LSTM time-series sequence
+sensor_history = deque(maxlen=10)
+
 # RELAY STATES (Kasama na ang feeder)
 relay_states = {
     "do": 1,
@@ -41,6 +48,20 @@ relay_states = {
 
 # DEFAULT DYNAMIC SCHEDULES (24-Hour Format: HH:MM)
 dynamic_schedules = ["06:00", "12:00", "18:00", "00:00"] 
+
+#09/04/26 ai model loading block 
+try:
+    scaler = joblib.load('scaler.pkl')
+    svm_do = joblib.load('svm_do.pkl')
+    svm_ph = joblib.load('svm_ph.pkl')
+    svm_temp = joblib.load('svm_temp.pkl')
+    lstm_do = load_model('lstm_do.keras')
+    lstm_ph = load_model('lstm_ph.keras')
+    lstm_temp = load_model('lstm_temp.keras')
+    print("All ML models and scaler loaded successfully!")
+except Exception as e:
+    print(f"Error loading models or scaler: {e}")
+    scaler = svm_do = svm_ph = svm_temp = lstm_do = lstm_ph = lstm_temp = None
 
 # --- BACKGROUND TIMER PARA SA SCHEDULED FEEDING ---
 def check_schedule():
@@ -62,7 +83,7 @@ def check_schedule():
 
 # --- MQTT CALLBACK KUNG MAY DATA MULA ESP32 ---
 def on_message(client, userdata, msg):
-    global latest_sensor_data
+    global latest_sensor_data, sensor_history
     try:
         payload = msg.payload.decode('utf-8')
         data = json.loads(payload) 
@@ -76,7 +97,20 @@ def on_message(client, userdata, msg):
         if "nitrite" in data: latest_sensor_data["nitrite"] = str(data["nitrite"])
         if "turbidity" in data: latest_sensor_data["turbidity"] = str(data["turbidity"])
         
-        print(f"Live Data Updated: {latest_sensor_data}")
+        # --- IDAGDAG ITO: I-save sa history buffer para sa LSTM ---
+        current_features = [
+            float(latest_sensor_data["temp"]),
+            float(latest_sensor_data["ph"]),
+            float(latest_sensor_data["do"]),
+            float(latest_sensor_data["salinity"]),
+            float(latest_sensor_data["ammonia"]),
+            float(latest_sensor_data["nitrate"]),
+            float(latest_sensor_data["nitrite"]),
+            float(latest_sensor_data["turbidity"])
+        ]
+        sensor_history.append(current_features)
+        
+        print(f"Live Data Updated & Buffered: {latest_sensor_data}")
     except Exception as e:
         print(f"Error sa pagbasa ng MQTT message: {e}")
 
@@ -170,6 +204,76 @@ def get_data():
     if not session.get('logged_in'): return jsonify({"error": "Unauthorized"}), 401
     return jsonify(latest_sensor_data)
 
+#09/04/26 ai model route
+@app.route('/predict_ai')
+def predict_ai():
+    if not session.get('logged_in'): 
+        return jsonify({"error": "Unauthorized"}), 401
+
+    if not scaler or not svm_do or not lstm_do:
+        return jsonify({"status": "error", "message": "Models not initialized"}), 500
+
+    try:
+        # Siguraduhing may sapat na sensor history ang buffer
+        if len(sensor_history) < 10:
+            current_features = [
+                float(latest_sensor_data["temp"]),
+                float(latest_sensor_data["ph"]),
+                float(latest_sensor_data["do"]),
+                float(latest_sensor_data["salinity"]),
+                float(latest_sensor_data["ammonia"]),
+                float(latest_sensor_data["nitrate"]),
+                float(latest_sensor_data["nitrite"]),
+                float(latest_sensor_data["turbidity"])
+            ]
+            while len(sensor_history) < 10:
+                sensor_history.append(current_features)
+
+        # 1. Sequence processing para kay LSTM
+        history_array = np.array(list(sensor_history))
+        scaled_history = scaler.transform(history_array)
+        lstm_sequence_input = scaled_history.reshape(1, scaled_history.shape[0], scaled_history.shape[1])
+
+        # LSTM Forecast (Hinuhulaan ang future sensor values sa susunod na 30 mins)
+        future_do = float(lstm_do.predict(lstm_sequence_input)[0][0])
+        future_ph = float(lstm_ph.predict(lstm_sequence_input)[0][0])
+        future_temp = float(lstm_temp.predict(lstm_sequence_input)[0][0])
+
+        # 2. I-pasa ang hula ni LSTM kay SVM para i-evaluate kung Safe o Unsafe
+        future_features = scaled_history[-1].copy()
+        future_features[0] = future_temp
+        future_features[1] = future_ph
+        future_features[2] = future_do
+        svm_input_array = future_features.reshape(1, -1)
+
+        # SVM Classification Result (Halimbawa: 1 = Safe, 0 = Unsafe, o sinusukat ang boundary score)
+        svm_score_do = float(svm_do.predict(svm_input_array)[0])
+        svm_score_ph = float(svm_ph.predict(svm_input_array)[0])
+        
+        # Logic para sa Safe / Unsafe verdict
+        avg_svm_score = (svm_score_do + svm_score_ph) / 2.0
+        
+        # Halimbawa ng threshold: kung ang score ay lagpas o pasok sa ideal range
+        is_safe = True
+        if future_ph < 7.0 or future_ph > 9.0 or future_temp < 26.0 or future_temp > 33.0 or future_do < 4.0:
+            is_safe = False
+
+        water_status = "SAFE" if is_safe else "UNSAFE"
+        risk_color = "#22c55e" if is_safe else "#ef4444"
+
+        return jsonify({
+            "status": "success",
+            "forecast_temp": round(future_temp, 1),
+            "forecast_ph": round(future_ph, 2),
+            "forecast_do": round(future_do, 2),
+            "svm_status": water_status,
+            "risk_color": risk_color
+        })
+        
+    except Exception as e:
+        print(f"Hybrid Pipeline Error: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+    #09/04/26
 
 # --- ROUTE PARA I-UPDATE ANG FEEDING SCHEDULE MULA SA WEB ---
 @app.route('/update_schedule', methods=['POST'])
