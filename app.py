@@ -228,33 +228,29 @@ def predict_ai():
             while len(sensor_history) < 10:
                 sensor_history.append(current_features)
 
-        # 1. Sequence processing para kay LSTM
+        # 1. Sequence processing para kay LSTM (Kunin ang unang 3 columns para sa 3-feature scaler)
         history_array = np.array(list(sensor_history))
-        scaled_history = scaler.transform(history_array)
+        scaled_history = scaler.transform(history_array[:, :3])
         lstm_sequence_input = scaled_history.reshape(1, scaled_history.shape[0], scaled_history.shape[1])
-
+        
         # LSTM Forecast (Hinuhulaan ang future sensor values sa susunod na 30 mins)
         future_do = float(lstm_do.predict(lstm_sequence_input)[0][0])
         future_ph = float(lstm_ph.predict(lstm_sequence_input)[0][0])
         future_temp = float(lstm_temp.predict(lstm_sequence_input)[0][0])
 
-        # 2. I-pasa ang hula ni LSTM kay SVM para i-evaluate kung Safe o Unsafe
-        future_features = scaled_history[-1].copy()
-        future_features[0] = future_temp
-        future_features[1] = future_ph
-        future_features[2] = future_do
-        svm_input_array = future_features.reshape(1, -1)
+        # 2. I-pasa ang hula kay SVM (Gumamit ng hiwalay at tamang shape para sa bawat model)
+        svm_input_temp = np.array([[future_temp]])
+        svm_input_ph = np.array([[future_ph]])
+        svm_input_do = np.array([[future_do]])
 
-        # SVM Classification Result (Halimbawa: 1 = Safe, 0 = Unsafe, o sinusukat ang boundary score)
-        svm_score_do = float(svm_do.predict(svm_input_array)[0])
-        svm_score_ph = float(svm_ph.predict(svm_input_array)[0])
+        # SVM Classification / Regression Results
+        svm_score_temp = float(svm_temp.predict(svm_input_temp)[0])
+        svm_score_ph = float(svm_ph.predict(svm_input_ph)[0])
+        svm_score_do = float(svm_do.predict(svm_input_do)[0])
         
         # Logic para sa Safe / Unsafe verdict
-        avg_svm_score = (svm_score_do + svm_score_ph) / 2.0
-        
-        # Halimbawa ng threshold: kung ang score ay lagpas o pasok sa ideal range
         is_safe = True
-        if future_ph < 7.0 or future_ph > 9.0 or future_temp < 26.0 or future_temp > 33.0 or future_do < 4.0:
+        if future_ph < 7.0 or future_ph > 9.0 or future_temp < 27.0 or future_temp > 32.0 or future_do < 4.0:
             is_safe = False
 
         water_status = "SAFE" if is_safe else "UNSAFE"
@@ -268,7 +264,7 @@ def predict_ai():
             "svm_status": water_status,
             "risk_color": risk_color
         })
-        
+            
     except Exception as e:
         print(f"Hybrid Pipeline Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
