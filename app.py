@@ -312,11 +312,17 @@ def update_schedule():
     # I-verify kung valid na listahan ang ipinasa
     if new_schedules and isinstance(new_schedules, list):
         dynamic_schedules = new_schedules
-        print(f"\n[!] Bagong Feeding Schedule na-save: {dynamic_schedules}\n")
+        
+        # --- ITO ANG KULANG: I-save sa JSON file ---
+        settings = load_settings()
+        settings['dynamic_schedules'] = dynamic_schedules
+        save_settings(settings)
+        # -------------------------------------------
+        
+        print(f"\n[!] Bagong Feeding Schedule na-save sa file: {dynamic_schedules}\n")
         return jsonify({"status": "success", "schedules": dynamic_schedules})
     
     return jsonify({"status": "error", "message": "Invalid data format"}), 400
-
 
 # --- ROUTE PARA SA MANUAL BUTTON (AERATOR/HEATER/PUMP/FEEDER) ---
 @app.route('/control_relay', methods=['POST'])
