@@ -211,7 +211,20 @@ def sensors():
 def feeding():
     if not session.get('logged_in'): return redirect(url_for('login'))
     settings = load_settings()
-    return render_template('feeding.html', settings=settings)
+    
+    # Kuhanin ang kasalukuyang petsa ngayon para laging updated ang default
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    
+    # Pwedeng i-set ang start date ng 1 buwan ang nakalipas at end date ay ngayon
+    default_start = request.args.get('start_date', datetime.datetime.now().replace(day=1).strftime('%Y-%m-%d'))
+    default_end = request.args.get('end_date', today)
+    status = request.args.get('status', 'All Statuses')
+    
+    return render_template('feeding.html', 
+                         settings=settings, 
+                         start_date=default_start, 
+                         end_date=default_end,
+                         selected_status=status)
 
 @app.route('/about')
 def about():

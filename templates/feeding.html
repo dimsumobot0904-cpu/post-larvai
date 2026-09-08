@@ -121,22 +121,23 @@
     <div class="filter-row">
         <div class="filter-group">
             <label>Start Date</label>
-            <input type="date" value="2026-01-22">
+            <input type="date" name="start_date" value="{{ start_date }}">
         </div>
         <div class="filter-group">
             <label>End Date</label>
-            <input type="date" value="2026-02-21">
+            <input type="date" name="end_date" value="{{ end_date }}">
         </div>
         <div class="filter-group">
             <label>Status</label>
-            <select>
-                <option>All Statuses</option>
-                <option>Completed</option>
-                <option>Pending</option>
+            <select name="status">
+                <option {% if selected_status == 'All Statuses' %}selected{% endif %}>All Statuses</option>
+                <option {% if selected_status == 'Completed' %}selected{% endif %}>Completed</option>
+                <option {% if selected_status == 'Pending' %}selected{% endif %}>Pending</option>
             </select>
         </div>
-        <button class="btn-filter"><i class="fa-solid fa-filter"></i> Filter Logs</button>
+        <button type="submit" class="btn-filter"><i class="fa-solid fa-filter"></i> Filter Logs</button>
     </div>
+</div>
 
     <table class="feed-table">
         <thead>
