@@ -369,8 +369,9 @@
             <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 5px;">Day 1 Start Date
             </div>
 
+            <!-- TINAWAG DITO ANG SETTINGS.TIMELINE_DATE -->
             <div class="input-lock-group">
-                <input type="date" id="timeline-date" value="2026-07-20" disabled
+                <input type="date" id="timeline-date" value="{{ settings.timeline_date }}" disabled
                     style="background-color: #f1f5f9; width: 100%;">
                 <button type="button" id="btn-toggle-timeline" class="btn-teal"
                     onclick="toggleLock('timeline-date', 'btn-toggle-timeline')">
@@ -512,10 +513,11 @@
         <div>
             <div style="font-size: 0.8rem; font-weight: 700; color: #475569;">Feeding Schedule</div>
             <div class="schedule-grid-2x2">
+                <!-- TINAWAG DITO ANG SETTINGS.DYNAMIC_SCHEDULES (Index 0 hanggang 3) -->
                 <div class="sched-item">
                     <div class="input-lock-group">
-                        <input type="time" id="sched-1" value="06:00" style="width: 100%; background: #f1f5f9;"
-                            disabled>
+                        <input type="time" id="sched-1" value="{{ settings.dynamic_schedules[0] }}"
+                            style="width: 100%; background: #f1f5f9;" disabled>
                         <button type="button" id="btn-sched-1" class="btn-teal"
                             onclick="toggleSaveField('sched-1', 'btn-sched-1')"><i class="fa-solid fa-pen"></i></button>
                     </div>
@@ -523,8 +525,8 @@
                 </div>
                 <div class="sched-item">
                     <div class="input-lock-group">
-                        <input type="time" id="sched-2" value="12:00" style="width: 100%; background: #f1f5f9;"
-                            disabled>
+                        <input type="time" id="sched-2" value="{{ settings.dynamic_schedules[1] }}"
+                            style="width: 100%; background: #f1f5f9;" disabled>
                         <button type="button" id="btn-sched-2" class="btn-teal"
                             onclick="toggleSaveField('sched-2', 'btn-sched-2')"><i class="fa-solid fa-pen"></i></button>
                     </div>
@@ -532,8 +534,8 @@
                 </div>
                 <div class="sched-item">
                     <div class="input-lock-group">
-                        <input type="time" id="sched-3" value="18:00" style="width: 100%; background: #f1f5f9;"
-                            disabled>
+                        <input type="time" id="sched-3" value="{{ settings.dynamic_schedules[2] }}"
+                            style="width: 100%; background: #f1f5f9;" disabled>
                         <button type="button" id="btn-sched-3" class="btn-teal"
                             onclick="toggleSaveField('sched-3', 'btn-sched-3')"><i class="fa-solid fa-pen"></i></button>
                     </div>
@@ -541,8 +543,8 @@
                 </div>
                 <div class="sched-item">
                     <div class="input-lock-group">
-                        <input type="time" id="sched-4" value="00:00" style="width: 100%; background: #f1f5f9;"
-                            disabled>
+                        <input type="time" id="sched-4" value="{{ settings.dynamic_schedules[3] }}"
+                            style="width: 100%; background: #f1f5f9;" disabled>
                         <button type="button" id="btn-sched-4" class="btn-teal"
                             onclick="toggleSaveField('sched-4', 'btn-sched-4')"><i class="fa-solid fa-pen"></i></button>
                     </div>
@@ -553,7 +555,7 @@
     </div>
 </div>
 
-<!-- 5. AI/ML Model Predictions Cards (Updated para sa LSTM Forecast + SVM Status) -->
+<!-- 5. AI/ML Model Predictions Cards -->
 <div class="dashboard-card" style="background: transparent; border: none; padding: 0; box-shadow: none;">
     <div
         style="font-weight: 700; font-size: 1rem; color: #1e293b; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
@@ -620,7 +622,7 @@
 
 {% block extra_js %}
 <script>
-    // Toggle Timeline Lock/Unlock
+    // Toggle Timeline Lock/Unlock at i-save sa backend kapag ni-lock
     function toggleLock(inputId, buttonId) {
         const inputEl = document.getElementById(inputId);
         const btnEl = document.getElementById(buttonId);
@@ -639,7 +641,21 @@
             btnEl.style.backgroundColor = "#00a8cc";
 
             calculateMonitoringProgress();
-            alert("Na-save ang timeline date!");
+
+            // SEND POST REQUEST TO FLASK TO SAVE THE TIMELINE DATE (NEW!)
+            let formData = new FormData();
+            formData.append('timeline_date', inputEl.value);
+
+            fetch('/dashboard', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Timeline date saved on system!");
+                    }
+                })
+                .catch(error => console.error("Error updating timeline date:", error));
         }
     }
 
@@ -803,18 +819,16 @@
             .catch(error => console.error('Error triggering feeder:', error));
     }
 
-    // Fetch AI/ML Predictions from Backend (DINI INILAGAY)
+    // Fetch AI/ML Predictions from Backend
     function updateAIPredictions() {
         fetch('/predict_ai')
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Update LSTM Forecast Cards
                     document.getElementById('forecast-temp').innerText = data.forecast_temp + ' °C';
                     document.getElementById('forecast-ph').innerText = data.forecast_ph;
                     document.getElementById('forecast-do').innerText = data.forecast_do + ' ppm';
 
-                    // Update SVM Status Card
                     const statusEl = document.getElementById('svm-status');
                     const riskEl = document.getElementById('svm-risk-level');
 
@@ -830,6 +844,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         const dateInput = document.getElementById('timeline-date');
+        // Awtomatikong ise-set sa current date KUNG walang nakasave sa settings.json
         if (!dateInput.value) {
             dateInput.value = new Date().toISOString().split('T')[0];
         }
@@ -838,7 +853,6 @@
         triggerLiveDashboardUpdate();
         setInterval(triggerLiveDashboardUpdate, 2000);
 
-        // DINI INILAGAY ANG PAG-TAWAG SA AI PREDICTIONS
         updateAIPredictions();
         setInterval(updateAIPredictions, 5000);
     });

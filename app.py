@@ -3,6 +3,7 @@ import datetime
 import threading
 import time
 import json
+import os
 import paho.mqtt.client as mqtt
 #09/04/26 testing ai ngani
 from collections import deque
@@ -45,8 +46,25 @@ relay_states = {
     "feeder": 0  
 }
 
-# DEFAULT DYNAMIC SCHEDULES (24-Hour Format: HH:MM)
-dynamic_schedules = ["06:00", "12:00", "18:00", "00:00"] 
+# 09/08/26 SETTINGS FILE PARA SA PERMANENT STORAGE
+SETTINGS_FILE = "settings.json"
+
+def load_settings():
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, 'r') as f:
+                return json.load(f)
+        except:
+            pass
+    return {"timeline_date": "", "dynamic_schedules": ["06:00", "12:00", "18:00", "00:00"]}
+
+def save_settings(data):
+    with open(SETTINGS_FILE, 'w') as f:
+        json.dump(data, f)
+
+# I-load ang saved schedules o gamitin ang defaults
+app_settings = load_settings()
+dynamic_schedules = app_settings.get("dynamic_schedules", ["06:00", "12:00", "18:00", "00:00"])
 
 #09/04/26 ai model loading block 
 try:
@@ -168,10 +186,21 @@ def logout():
     return redirect(url_for('login'))
 
 @app.route('/')
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('index.html')
+    
+    settings = load_settings()
+    
+    # Kung nag-save ng timeline date mula sa form
+    if request.method == 'POST':
+        timeline = request.form.get('timeline_date')
+        if timeline is not None:
+            settings['timeline_date'] = timeline
+            save_settings(settings)
+        return redirect(url_for('dashboard'))
+        
+    return render_template('index.html', settings=settings)
 
 @app.route('/sensors')
 def sensors():
@@ -181,7 +210,8 @@ def sensors():
 @app.route('/feeding')
 def feeding():
     if not session.get('logged_in'): return redirect(url_for('login'))
-    return render_template('feeding.html')
+    settings = load_settings()
+    return render_template('feeding.html', settings=settings)
 
 @app.route('/about')
 def about():
